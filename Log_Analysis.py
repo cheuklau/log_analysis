@@ -10,33 +10,28 @@ import psycopg2
 # Set the database name
 DBNAME = "news"
 
-# Define function for answering question number one:
-# What are the most popular three articles of all time?
+
 def question_1():
-  ''' Returns the three most popular articles of all time.
+    ''' Returns the three most popular articles of all time.
 
-  Connect to news database, execute SQL command to find the
-  three most popular articles of all time.
+    Connect to news database, execute SQL command to find the
+    three most popular articles of all time.
 
-  Args:
-      None
+    Args:
+        None
 
-  Returns:
-      The three most popular articles of all time.
-  '''
+    Returns:
+        The three most popular articles of all time.
+    '''
 
-  # Connect to data base
-  db = psycopg2.connect(database=DBNAME)
+    # Connect to data base
+    db = psycopg2.connect(database=DBNAME)
 
-  # Get database cursor
-  c = db.cursor()
+    # Get database cursor
+    c = db.cursor()
 
-  # Execute SQL query
-  # Strategy:
-  # 1) Join articles and log tables on articles.slug contained in log.path.
-  # 2) Count the occurrences of each title, and order titles by count.
-  # 3) Return the top three articles with the most counts.
-  c.execute("select title, count(*) as tot_count \
+    # Execute SQL query
+    c.execute("select title, count(*) as tot_count \
     from ( select title \
     from articles join log \
     on log.path like '%' || articles.slug || '%') as art_log \
@@ -44,40 +39,34 @@ def question_1():
     order by tot_count desc \
     limit 3;")
 
-  # Return cursor results
-  return c.fetchall()
+    # Return cursor results
+    return c.fetchall()
 
-  # Close the database
-  db.close()
+    # Close the database
+    db.close()
 
-# Define function for answering question number two:
-# Who are the most popular article authors of all time?
+
 def question_2():
-  ''' Returns a sorted list of authors based on their view count.
+    ''' Returns a sorted list of authors based on their view count.
 
-  Connect to news database, execute SQL command to create a sorted
-  list of authors based on their view count.
+    Connect to news database, execute SQL command to create a sorted
+    list of authors based on their view count.
 
-  Args:
-      None
+    Args:
+        None
 
-  Returns:
-      Sorted list of authors based on their view count.
-  '''
+    Returns:
+        Sorted list of authors based on their view count.
+    '''
 
-  # Connect to data base
-  db = psycopg2.connect(database=DBNAME)
+    # Connect to data base
+    db = psycopg2.connect(database=DBNAME)
 
-  # Get database cursor
-  c = db.cursor()
+    # Get database cursor
+    c = db.cursor()
 
-  # Execute SQL query
-  # Strategy:
-  # 1) Join articles and log tables on articles.slug contained in log.path.
-  # 2) Join author with the result of step 1 on author id.
-  # 3) Count the occurrence of each author, and order authors by count.
-  # 4) Return the list of authors sorted by count in descending order.
-  c.execute("select name, count(*) as tot_count \
+    # Execute SQL query
+    c.execute("select name, count(*) as tot_count \
     from \
     (( select author \
     from articles join log \
@@ -87,40 +76,34 @@ def question_2():
     group by name \
     order by tot_count desc;")
 
-  # Return cursor results
-  return c.fetchall()
+    # Return cursor results
+    return c.fetchall()
 
-  # Close the database
-  db.close()
+    # Close the database
+    db.close()
 
-# Define function for answering question number three:
-# On which days did more than 1% of requests lead to errors?
+
 def question_3():
-  ''' Returns a sorted list of the error percentage for each day.
+    ''' Returns a sorted list of the error percentage for each day.
 
-  Connect to news database, execute SQL command to create a sorted
-  list of the error percentage for each day.
+    Connect to news database, execute SQL command to create a sorted
+    list of the error percentage for each day.
 
-  Args:
-      None
+    Args:
+        None
 
-  Returns:
-      Sorted list of error percentage for each day.
-  '''
+    Returns:
+        Sorted list of error percentage for each day.
+    '''
 
-  # Connect to data base
-  db = psycopg2.connect(database=DBNAME)
+    # Connect to data base
+    db = psycopg2.connect(database=DBNAME)
 
-  # Get database cursor
-  c = db.cursor()
+    # Get database cursor
+    c = db.cursor()
 
-  # Execute SQL query
-  # Strategy:
-  # 1) Join articles and log tables on articles.slug contained in log.path.
-  # 2) Join author with the result of step 1 on author id.
-  # 3) Count the occurrence of each author, and order authors by count.
-  # 4) Return the list of authors sorted by count in descending order.
-  c.execute("select date, \
+    # Execute SQL query
+    c.execute("select date, \
     100.0 * cast(err_cts as float) / cast(tot_cts as float) as per_err \
     from \
     (select date_tot_cts.date, tot_cts, err_cts \
@@ -140,13 +123,13 @@ def question_3():
     group by date) \
     as date_err_cts \
     on date_tot_cts.date = date_err_cts.date) as date_err_tot_cts \
-    order by per_err desc;") 
+    order by per_err desc;")
 
-  # Return cursor results
-  return c.fetchall()
+    # Return cursor results
+    return c.fetchall()
 
-  # Close the database
-  db.close()
+    # Close the database
+    db.close()
 
 # Main code
 
@@ -157,7 +140,7 @@ result_1 = question_1()
 print('###################################################################')
 print('The three most popular articles of all time are:')
 for i in range(0, 3):
-  print(result_1[i][0] + ' with ' + str(result_1[i][1]) + ' views')
+    print(result_1[i][0] + ' with ' + str(result_1[i][1]) + ' views')
 print('###################################################################\n')
 
 # Execute the function to answer the second question
@@ -167,7 +150,7 @@ result_2 = question_2()
 print('###################################################################')
 print('The list of authors in descending order based on view counts: ')
 for result in result_2:
-  print(result[0] + ' with ' + str(result[1]) + ' views')
+    print(result[0] + ' with ' + str(result[1]) + ' views')
 print('###################################################################\n')
 
 # Execute the function to answer the third question
@@ -177,5 +160,5 @@ result_3 = question_3()
 print('###################################################################')
 print('The list of error percentage in descending order for each day: ')
 for result in result_3:
-  print(str(result[0]) + ' had ' + str(result[1]) + '% errors')
+    print(str(result[0]) + ' had ' + str(result[1]) + '% errors')
 print('###################################################################\n')

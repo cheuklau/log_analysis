@@ -32,7 +32,9 @@ both are provided below:
 -PostgreSQL (https://www.postgresql.org)
 
 # Compilation Instructions
-The site's data is provided in newsdata.sql. Run the following command:
+The site's data is provided in [newsdata.sql](https://tinyurl.com/y9p554lu). 
+
+Run the following command:
 ```
 psql -d news -f newsdata.sql
 ```
