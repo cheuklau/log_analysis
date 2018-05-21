@@ -11,6 +11,27 @@ import psycopg2
 DBNAME = "news"
 
 
+def connect(database_name="news"):
+    ''' Returns database connection and cursor
+
+    Sets up connection with the database and cursor.
+
+    Args:
+        Database name
+
+    Returns:
+
+        database connection and cursor
+    '''
+
+    try:
+        db = psycopg2.connect("dbname={}".format(database_name))
+        cursor = db.cursor()
+        return db, cursor
+    except:
+        print("Error connecting to the database")
+
+
 def question_1():
     ''' Returns the three most popular articles of all time.
 
@@ -24,20 +45,17 @@ def question_1():
         The three most popular articles of all time.
     '''
 
-    # Connect to data base
-    db = psycopg2.connect(database=DBNAME)
-
-    # Get database cursor
-    c = db.cursor()
+    # Connect to data base and set up cursor
+    db, c = connect()
 
     # Execute SQL query
-    c.execute("select title, count(*) as tot_count \
-    from ( select title \
-    from articles join log \
-    on log.path like '%' || articles.slug || '%') as art_log \
-    group by title \
-    order by tot_count desc \
-    limit 3;")
+    c.execute("SELECT title, count(*) AS tot_count \
+    FROM ( SELECT title \
+    FROM articles JOIN log \
+    ON log.path LIKE '%' || articles.slug || '%') AS art_log \
+    GROUP BY title \
+    ORDER BY tot_count DESC \
+    LIMIT 3;")
 
     # Return cursor results
     return c.fetchall()
@@ -59,22 +77,19 @@ def question_2():
         Sorted list of authors based on their view count.
     '''
 
-    # Connect to data base
-    db = psycopg2.connect(database=DBNAME)
-
-    # Get database cursor
-    c = db.cursor()
+    # Connect to data base and set up cursor
+    db, c = connect()
 
     # Execute SQL query
-    c.execute("select name, count(*) as tot_count \
-    from \
-    (( select author \
-    from articles join log \
-    on log.path like '%' || articles.slug || '%') as art_log \
-    join authors \
-    on art_log.author = authors.id) as art_log_auth \
-    group by name \
-    order by tot_count desc;")
+    c.execute("SELECT name, count(*) AS tot_count \
+    FROM \
+    (( SELECT author \
+    FROM articles JOIN log \
+    ON log.path LIKE '%' || articles.slug || '%') AS art_log \
+    JOIN authors \
+    ON art_log.author = authors.id) AS art_log_auth \
+    GROUP BY name \
+    ORDER BY tot_count DESC;")
 
     # Return cursor results
     return c.fetchall()
@@ -96,34 +111,31 @@ def question_3():
         Sorted list of error percentage for each day.
     '''
 
-    # Connect to data base
-    db = psycopg2.connect(database=DBNAME)
-
-    # Get database cursor
-    c = db.cursor()
+    # Connect to data base and set up cursor
+    db, c = connect()
 
     # Execute SQL query
-    c.execute("select date, \
-    100.0 * cast(err_cts as float) / cast(tot_cts as float) as per_err \
-    from \
-    (select date_tot_cts.date, tot_cts, err_cts \
-    from \
-    (select date, count(*) as tot_cts \
-    from (select time::DATE as date, status \
-    from log) \
-    as date_stat \
-    group by date) \
-    as date_tot_cts \
-    join \
-    (select date, count(*) as err_cts \
-    from (select time::DATE as date, status \
-    from log \
-    where status = '404 NOT FOUND') \
-    as date_staterr \
-    group by date) \
-    as date_err_cts \
-    on date_tot_cts.date = date_err_cts.date) as date_err_tot_cts \
-    order by per_err desc;")
+    c.execute("SELECT date, \
+    100.0 * cast(err_cts AS float) / cast(tot_cts AS float) AS per_err \
+    FROM \
+    (SELECT date_tot_cts.date, tot_cts, err_cts \
+    FROM \
+    (SELECT date, count(*) AS tot_cts \
+    FROM (SELECT time::DATE AS date, status \
+    FROM log) \
+    AS date_stat \
+    GROUP BY date) \
+    AS date_tot_cts \
+    JOIN \
+    (SELECT date, count(*) AS err_cts \
+    FROM (SELECT time::DATE AS date, status \
+    FROM log \
+    WHERE status = '404 NOT FOUND') \
+    AS date_staterr \
+    GROUP BY date) \
+    AS date_err_cts \
+    ON date_tot_cts.date = date_err_cts.date) AS date_err_tot_cts \
+    ORDER BY per_err DESC;")
 
     # Return cursor results
     return c.fetchall()
@@ -160,5 +172,5 @@ result_3 = question_3()
 print('###################################################################')
 print('The list of error percentage in descending order for each day: ')
 for result in result_3:
-    print(str(result[0]) + ' had ' + str(result[1]) + '% errors')
+    print(str(result[0]) + ' had ' + str(round(result[1], 2)) + '% errors')
 print('###################################################################\n')
