@@ -54,7 +54,3 @@ python log_analysis.py
 ```
 The python code will connect to the news database, use SQL queries to 
 analyze the data, and display the requested trends.
-
-# Credits
-This project is generated as part of Udacity's full-stack web development
-program.
